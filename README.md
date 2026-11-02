@@ -112,3 +112,7 @@ LOOMIS_LIVE_SAMPLES=64 LOOMIS_REDRAW_MS=80 LOOMIS_TIMING=1 krita
 `LOOMIS_LIVE_SAMPLES` changes live curve resolution (16–1024, default 128).
 `LOOMIS_REDRAW_MS` changes the live redraw interval (0–1000 ms, default 40).
 Restart Krita after changing them.
+
+### NOTE
+
+undo history will be bloated due to skill issue
