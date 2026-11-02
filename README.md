@@ -80,24 +80,6 @@ On Linux the preset file is usually
 
 The plugin uses the library name `loomis_head`, so it cannot be installed alongside another plugin that uses the same library name.
 
-## Development
-
-Run from this directory:
-
-```sh
-python3 -m unittest discover -s tests
-python3 build_zip.py
-python3 scripts/build_zip.py <version>
-```
-
-`build_zip.py` rebuilds `loomis-head.zip` for local install.
-`scripts/build_zip.py <version>` writes a clean release archive to
-`dist/loomis_head-<version>.zip` without caches, tests, or scripts.
-
-Tests cover the geometry generator, preset storage, head naming/discovery, trackball angle extraction, and UI XML and do not need Krita. The trackball widget tests need PyQt5 and are skipped when it is unavailable. `build_zip.py` rebuilds and verifies `loomis-head.zip`, then installs it into Krita's local `pykrita` directory and removes the old installed module directory first. Restart Krita to load. Use `--no-install` to build only, or `--pykrita-dir <path>` to install elsewhere.
-
-See [TESTING.md](TESTING.md) for the testing strategy, fake-Krita techniques, coverage map, and the parts that still need manual Krita verification.
-
 ### Performance logging
 
 Live redraws call Krita synchronously, so the useful timings are inside the
