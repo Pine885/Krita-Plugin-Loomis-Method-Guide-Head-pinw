@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=Krita/PythonPlugin
+X-KDE-Library=loomis_head
+X-Python-2-Compatible=false
+Name=Loomis Method Head Guide
+Comment=Loomis Method head construction guide
