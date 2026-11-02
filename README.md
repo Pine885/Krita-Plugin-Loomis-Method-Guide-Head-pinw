@@ -25,14 +25,17 @@ Based on the original [Loomis Head Generator by lm0ss](https://github.com/lm0ss/
 
 ## Requirements
 
-- Krita with Python support (tested on Krita 5.3)
+- Krita 5.x with Python support
+- PyQt5 (bundled with Krita 5.x)
 - Python >= 3.10
+
+Krita 6 / PyQt6 is not supported.
 
 ## Installation
 
 - Download `loomis-head.zip`.
-- In Krita: Tools -> Scripts -> Import Plugin From File.
-- Enable the plugin, restart Krita.
+- In Krita: Tools -> Scripts -> Import Python Plugin from File.
+- Enable the plugin under Settings -> Dockers, then restart Krita.
 
 ## Usage
 
@@ -45,6 +48,10 @@ Enable **Settings -> Dockers -> Loomis Method Head Guide**.
 Each head is a separate vector layer named `_HeadGuide_1`, `_HeadGuide_2`,
 and so on. Existing head layers are rediscovered when the document changes.
 Legacy `Loomis Method Head Guide` layers are still recognized.
+
+> **Warning:** layers named `_HeadGuide_N` or `Loomis Method Head Guide [N]`
+> are managed by the plugin. Anything drawn directly on one of these layers is
+> erased the next time the guide is redrawn. Keep painting on a separate layer.
 
 ## Presets
 
@@ -60,13 +67,16 @@ Each head remembers the preset assigned to it, whether it has unsaved edits, and
 - Built-in presets cannot be overwritten or deleted.
 - If `presets.json` cannot be parsed, the plugin starts with the built-ins and keeps the damaged file as `presets.json.bak` before the next save.
 
-User presets are stored outside the project file:
+The plugin stores data in two places:
 
-```text
-<AppDataLocation>/loomis_method_head_guide/presets.json
-```
+- Per-document placement, direction, scale, preset assignment, and dirty flag
+  live in the document annotation `loomis_head_local_state` inside the `.kra`
+  file.
+- User presets are stored outside the project file at
+  `<AppDataLocation>/loomis_method_head_guide/presets.json`.
 
-On Linux this is usually `~/.local/share/krita/loomis_method_head_guide/presets.json`.
+On Linux the preset file is usually
+`~/.local/share/krita/loomis_method_head_guide/presets.json`.
 
 The plugin uses the library name `loomis_head`, so it cannot be installed alongside another plugin that uses the same library name.
 
@@ -77,7 +87,12 @@ Run from this directory:
 ```sh
 python3 -m unittest discover -s tests
 python3 build_zip.py
+python3 scripts/build_zip.py <version>
 ```
+
+`build_zip.py` rebuilds `loomis-head.zip` for local install.
+`scripts/build_zip.py <version>` writes a clean release archive to
+`dist/loomis_head-<version>.zip` without caches, tests, or scripts.
 
 Tests cover the geometry generator, preset storage, head naming/discovery, trackball angle extraction, and UI XML and do not need Krita. The trackball widget tests need PyQt5 and are skipped when it is unavailable. `build_zip.py` rebuilds and verifies `loomis-head.zip`, then installs it into Krita's local `pykrita` directory and removes the old installed module directory first. Restart Krita to load. Use `--no-install` to build only, or `--pykrita-dir <path>` to install elsewhere.
 
@@ -113,6 +128,6 @@ LOOMIS_LIVE_SAMPLES=64 LOOMIS_REDRAW_MS=80 LOOMIS_TIMING=1 krita
 `LOOMIS_REDRAW_MS` changes the live redraw interval (0–1000 ms, default 40).
 Restart Krita after changing them.
 
-### NOTE
+Tested with: Krita 5.3.4.1, Python 3.12.3
 
-undo history will be bloated due to skill issue
+License: GPL-3.0 (see LICENSE)

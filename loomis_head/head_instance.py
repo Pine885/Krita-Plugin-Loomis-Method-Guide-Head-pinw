@@ -248,7 +248,10 @@ class HeadInstance:
                 bounds = self.layer.bounds()
                 if bounds is None or bounds.isNull() or bounds.isEmpty():
                     return None
-                return (bounds.x() + bounds.width() / 2.0, bounds.y() + bounds.height() / 2.0)
+                return (
+                    (bounds.x() + bounds.width() / 2.0) / self.point_scale_x,
+                    (bounds.y() + bounds.height() / 2.0) / self.point_scale_y,
+                )
             except (AttributeError, RuntimeError, TypeError):
                 return None
 

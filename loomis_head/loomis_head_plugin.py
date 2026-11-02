@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from . import limits, local_state, timing
+from . import diag, limits, local_state, timing
 from .config import (
     LIVE_SAMPLES,
     LOCAL_SAVE_DEBOUNCE,
@@ -31,7 +31,7 @@ from .head_instance import (
 )
 from .linalg import q_identity
 from .loomis_head_generator import LoomisHead3D
-from .presets import PresetStore, builtin_names
+from .presets import PresetStore, builtin_names, clean_name, preset_label
 from .trackball import TrackballWidget
 
 PRESET_FOLDER = "loomis_method_head_guide"
@@ -208,7 +208,8 @@ class LoomisProportionsDocker(DockWidget):
     def _read_local_state(self, doc):
         try:
             payload = doc.annotation(local_state.ANNOTATION_TYPE)
-        except Exception:
+        except Exception as exc:
+            diag.warn("could not read local state: %s" % exc)
             return local_state.empty_state()
         if not payload:
             return local_state.empty_state()
@@ -226,7 +227,8 @@ class LoomisProportionsDocker(DockWidget):
                 local_state.ANNOTATION_DESCRIPTION,
                 QByteArray(payload),
             )
-        except Exception:
+        except Exception as exc:
+            diag.warn("could not write local state: %s" % exc)
             return
         self.local_dirty = False
 
@@ -576,18 +578,18 @@ class LoomisProportionsDocker(DockWidget):
 
     def _sync_preset_selection(self):
         combo = self.ui.presetCombo
-        for index in range(combo.count()):
-            text = combo.itemText(index)
-            if text.endswith(" *"):
-                combo.setItemText(index, text[:-2])
-
         instance = self.active_instance()
         name = instance.preset_name if instance is not None else None
+        builtins = builtin_names()
         combo.blockSignals(True)
+        for index in range(combo.count()):
+            item_name = combo.itemData(index)
+            combo.setItemText(index, preset_label(item_name, item_name in builtins))
         index = combo.findData(name) if name else -1
         combo.setCurrentIndex(index)
         if index >= 0 and instance is not None and instance.preset_dirty:
-            combo.setItemText(index, combo.itemText(index) + " *")
+            item_name = combo.itemData(index)
+            combo.setItemText(index, preset_label(item_name, item_name in builtins, True))
         combo.blockSignals(False)
         reset_button = self.ui.resetSettingsButton
         if index >= 0 and name:
@@ -728,8 +730,7 @@ class LoomisProportionsDocker(DockWidget):
         combo.blockSignals(True)
         combo.clear()
         for name, _model, is_builtin in self.preset_store.all_presets():
-            label = name if not is_builtin else "%s (built-in)" % name
-            combo.addItem(label, name)
+            combo.addItem(preset_label(name, is_builtin), name)
         if current is not None:
             index = combo.findData(current)
             if index >= 0:
@@ -779,7 +780,22 @@ class LoomisProportionsDocker(DockWidget):
         if not accepted:
             return
         try:
-            saved = self.preset_store.save(name, self.loomis_head.to_config_dict())
+            cleaned = clean_name(name)
+        except ValueError as exc:
+            QMessageBox.information(self, "Save preset", str(exc))
+            return
+        if cleaned in self.preset_store.user_presets():
+            answer = QMessageBox.question(
+                self,
+                "Save preset",
+                "Overwrite preset “%s”?" % cleaned,
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No,
+            )
+            if answer != QMessageBox.Yes:
+                return
+        try:
+            saved = self.preset_store.save(cleaned, self.loomis_head.to_config_dict())
         except ValueError as exc:
             QMessageBox.information(self, "Save preset", str(exc))
             return

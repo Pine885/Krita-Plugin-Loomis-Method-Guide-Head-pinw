@@ -14,6 +14,8 @@ import os
 import shutil
 import tempfile
 
+from . import diag
+
 from .linalg import q_axis_angle, q_mul
 
 SCHEMA_VERSION = 1
@@ -51,6 +53,13 @@ def builtin_names() -> list[str]:
     return list(BUILTIN_ORDER)
 
 
+def preset_label(name: str, is_builtin: bool, dirty: bool = False) -> str:
+    """Return the combo-box label for a preset, including the dirty marker."""
+    label = "%s (built-in)" % name if is_builtin else str(name)
+    if dirty:
+        label += " *"
+    return label
+
 def clean_name(name: str) -> str:
     cleaned = " ".join(str(name).split()).strip()
     if not cleaned:
@@ -74,8 +83,8 @@ class PresetStore:
         try:
             if os.path.exists(self.path):
                 shutil.copyfile(self.path, self.path + ".bak")
-        except OSError:
-            pass
+        except OSError as exc:
+            diag.warn("could not back up corrupt presets file: %s" % exc)
 
     def _load_file(self) -> dict:
         try:
