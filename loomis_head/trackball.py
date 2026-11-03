@@ -1,9 +1,9 @@
 # trackball.py
 import math
 
-from PyQt5.QtCore import QRect, Qt, pyqtSignal
-from PyQt5.QtGui import QBrush, QColor, QPainter, QPen
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtCore import QRect, QRectF, Qt, pyqtSignal
+from PyQt5.QtGui import QBrush, QColor, QPainter, QPainterPath, QPalette, QPen
+from PyQt5.QtWidgets import QToolButton, QWidget
 
 from .euclid import Vector3
 
@@ -16,6 +16,74 @@ from .linalg import (
     q_to_mat3,
     q_to_yaw_pitch_roll,
 )
+
+
+class _ResetButton(QToolButton):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setAutoRaise(True)
+        self.setFocusPolicy(Qt.NoFocus)
+        self.setAttribute(Qt.WA_NoSystemBackground, True)
+        self.setToolTip("Reset rotation")
+        self.setFixedSize(22, 22)
+
+    def paintEvent(self, event):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+
+        palette = self.palette()
+        scale = min(self.width(), self.height()) / 22.0
+        if not self.isEnabled():
+            color = palette.color(QPalette.Disabled, QPalette.ButtonText)
+        elif self.isDown():
+            color = palette.color(QPalette.Highlight).darker(120)
+        elif self.underMouse():
+            color = palette.color(QPalette.Highlight)
+        else:
+            color = QColor(palette.color(QPalette.ButtonText))
+            color.setAlphaF(0.7)
+
+        if self.isEnabled() and (self.underMouse() or self.isDown()):
+            background = QColor(palette.color(QPalette.Mid))
+            background.setAlphaF(0.28 if self.isDown() else 0.18)
+            p.setPen(Qt.NoPen)
+            p.setBrush(background)
+            p.drawRoundedRect(QRectF(self.rect()).adjusted(1.0, 1.0, -1.0, -1.0), 4.0, 4.0)
+
+        cx = self.width() / 2.0
+        cy = self.height() / 2.0
+        radius = 0.36 * min(self.width(), self.height())
+        rect = QRectF(cx - radius, cy - radius, 2.0 * radius, 2.0 * radius)
+        start_angle = 120.0
+        head_len = 4.8 * scale
+        head_half = 2.0 * scale
+        end_angle = 30.0
+        span_angle = (end_angle - start_angle) % 360.0
+
+        pen = QPen(color, 1.8 * scale)
+        pen.setCapStyle(Qt.RoundCap)
+        pen.setJoinStyle(Qt.RoundJoin)
+        p.setPen(pen)
+        p.setBrush(Qt.NoBrush)
+        arc = QPainterPath()
+        arc.arcMoveTo(rect, start_angle)
+        arc.arcTo(rect, start_angle, span_angle)
+        p.drawPath(arc)
+
+        theta = math.radians(end_angle)
+        base_x = cx + radius * math.cos(theta)
+        base_y = cy - radius * math.sin(theta)
+        ux = -math.sin(theta)
+        uy = -math.cos(theta)
+        nx, ny = -uy, ux
+        tip_x = base_x + ux * head_len
+        tip_y = base_y + uy * head_len
+        head = QPainterPath()
+        head.moveTo(tip_x, tip_y)
+        head.lineTo(base_x + nx * head_half, base_y + ny * head_half)
+        head.lineTo(base_x - nx * head_half, base_y - ny * head_half)
+        head.closeSubpath()
+        p.fillPath(head, color)
 
 
 class TrackballWidget(QWidget):
@@ -37,7 +105,17 @@ class TrackballWidget(QWidget):
         self._roll0 = 0.0
 
         self.setMouseTracking(False)
+        self.reset_button = _ResetButton(self)
         self._update_quaternion()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        button = getattr(self, "reset_button", None)
+        if button is None:
+            return
+        size = button.size()
+        button.move(self.width() - size.width() - 2, self.height() - size.height() - 2)
+        button.raise_()
 
     def _pos_to_forward_vec(self, pos):
         cx, cy, r = self._center_radius()

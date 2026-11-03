@@ -5,6 +5,25 @@
         <property name="windowTitle">
             <string>Loomis Method Head Guide</string>
         </property>
+        <property name="styleSheet">
+            <string notr="true">QSlider::groove:horizontal {
+    height: 10px;
+    background: palette(base);
+    border: 1px solid palette(mid);
+    border-radius: 5px;
+}
+QSlider::sub-page:horizontal {
+    background: palette(highlight);
+    border-radius: 5px;
+}
+QSlider::handle:horizontal {
+    width: 8px;
+    margin: -3px 0;
+    background: palette(button);
+    border: 1px solid palette(mid);
+    border-radius: 3px;
+}</string>
+        </property>
 
         <layout class="QVBoxLayout" name="verticalLayout">
             <property name="sizeConstraint">
@@ -44,20 +63,9 @@
             </item>
 
             <item>
-                <widget class="QFrame" name="separatorTop">
-                    <property name="frameShape">
-                        <enum>QFrame::HLine</enum>
-                    </property>
-                    <property name="frameShadow">
-                        <enum>QFrame::Sunken</enum>
-                    </property>
-                </widget>
-            </item>
-
-            <item>
-                <widget class="QGroupBox" name="groupHeads">
+                <widget class="QGroupBox" name="groupHead">
                     <property name="title">
-                        <string>Heads</string>
+                        <string>Head</string>
                     </property>
                     <property name="sizePolicy">
                         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -65,7 +73,7 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
-                    <layout class="QHBoxLayout" name="headsLayout">
+                    <layout class="QVBoxLayout" name="headLayout">
                         <property name="leftMargin">
                             <number>6</number>
                         </property>
@@ -82,54 +90,71 @@
                             <number>4</number>
                         </property>
                         <item>
-                            <widget class="QComboBox" name="headCombo">
-                                <property name="sizePolicy">
-                                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                                        <horstretch>1</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
+                            <layout class="QHBoxLayout" name="headsLayout">
+                                <property name="spacing">
+                                    <number>4</number>
                                 </property>
-                                <property name="minimumSize">
-                                    <size>
-                                        <width>70</width>
-                                        <height>0</height>
-                                    </size>
-                                </property>
-                                <property name="sizeAdjustPolicy">
-                                    <enum>QComboBox::AdjustToMinimumContentsLengthWithIcon</enum>
-                                </property>
-                                <property name="minimumContentsLength">
-                                    <number>6</number>
-                                </property>
-                            </widget>
+                                <item>
+                                    <widget class="QLabel" name="headLabel">
+                                        <property name="sizePolicy">
+                                            <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                                                <horstretch>1</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="minimumSize">
+                                            <size>
+                                                <width>70</width>
+                                                <height>0</height>
+                                            </size>
+                                        </property>
+                                        <property name="text">
+                                            <string>No head</string>
+                                        </property>
+                                    </widget>
+                                </item>
+                                <item>
+                                    <widget class="QPushButton" name="addHeadButton">
+                                        <property name="text">
+                                            <string>New</string>
+                                        </property>
+                                        <property name="toolTip">
+                                            <string>Create another head in this document.</string>
+                                        </property>
+                                    </widget>
+                                </item>
+                                <item>
+                                    <widget class="QPushButton" name="duplicateHeadButton">
+                                        <property name="text">
+                                            <string>Copy</string>
+                                        </property>
+                                        <property name="toolTip">
+                                            <string>Duplicate the selected head and its settings.</string>
+                                        </property>
+                                    </widget>
+                                </item>
+                                <item>
+                                    <widget class="QPushButton" name="deleteHeadButton">
+                                        <property name="text">
+                                            <string>Delete</string>
+                                        </property>
+                                        <property name="toolTip">
+                                            <string>Delete the selected head layer.</string>
+                                        </property>
+                                    </widget>
+                                </item>
+                            </layout>
                         </item>
                         <item>
-                            <widget class="QPushButton" name="addHeadButton">
+                            <widget class="QLabel" name="emptyHintLabel">
                                 <property name="text">
-                                    <string>New</string>
+                                    <string/>
                                 </property>
-                                <property name="toolTip">
-                                    <string>Create another head in this document.</string>
+                                <property name="wordWrap">
+                                    <bool>true</bool>
                                 </property>
-                            </widget>
-                        </item>
-                        <item>
-                            <widget class="QPushButton" name="duplicateHeadButton">
-                                <property name="text">
-                                    <string>Copy</string>
-                                </property>
-                                <property name="toolTip">
-                                    <string>Duplicate the selected head and its settings.</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item>
-                            <widget class="QPushButton" name="deleteHeadButton">
-                                <property name="text">
-                                    <string>Delete</string>
-                                </property>
-                                <property name="toolTip">
-                                    <string>Delete the selected head layer.</string>
+                                <property name="visible">
+                                    <bool>false</bool>
                                 </property>
                             </widget>
                         </item>
@@ -221,306 +246,218 @@
             </item>
 
             <item>
-                <layout class="QFormLayout" name="formLayout">
-                    <property name="fieldGrowthPolicy">
-                        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                <widget class="QGroupBox" name="groupShape">
+                    <property name="title">
+                        <string>Shape</string>
                     </property>
-                    <property name="labelAlignment">
-                        <set>Qt::AlignRight|Qt::AlignVCenter</set>
+                    <property name="sizePolicy">
+                        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
                     </property>
-                    <property name="formAlignment">
-                        <set>Qt::AlignLeft|Qt::AlignTop</set>
-                    </property>
-                    <property name="horizontalSpacing">
-                        <number>8</number>
-                    </property>
-                    <property name="verticalSpacing">
-                        <number>4</number>
-                    </property>
-
-                    <item row="0" column="0">
-                        <widget class="QLabel" name="labelSideCut">
-                            <property name="text">
-                                <string>Side cut:</string>
-                            </property>
-                            <property name="buddy">
-                                <cstring>sideCutSlider</cstring>
-                            </property>
-                        </widget>
-                    </item>
-                    <item row="0" column="1">
-                        <widget class="QSlider" name="sideCutSlider">
-                            <property name="minimumSize">
-                                <size>
-                                    <width>60</width>
-                                    <height>0</height>
-                                </size>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="orientation">
-                                <enum>Qt::Horizontal</enum>
-                            </property>
-                            <property name="minimum">
-                                <number>5</number>
-                            </property>
-                            <property name="maximum">
-                                <number>95</number>
-                            </property>
-                            <property name="value">
-                                <number>66</number>
-                            </property>
-                            <property name="singleStep">
-                                <number>1</number>
-                            </property>
-                            <property name="pageStep">
-                                <number>5</number>
-                            </property>
-                        </widget>
-                    </item>
-
-                    <item row="1" column="0">
-                        <widget class="QLabel" name="labelFrontStroke">
-                            <property name="text">
-                                <string>Front stroke:</string>
-                            </property>
-                            <property name="buddy">
-                                <cstring>frontStrokeSlider</cstring>
-                            </property>
-                        </widget>
-                    </item>
-                    <item row="1" column="1">
-                        <widget class="QSlider" name="frontStrokeSlider">
-                            <property name="minimumSize">
-                                <size>
-                                    <width>60</width>
-                                    <height>0</height>
-                                </size>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="orientation">
-                                <enum>Qt::Horizontal</enum>
-                            </property>
-                            <property name="minimum">
-                                <number>1</number>
-                            </property>
-                            <property name="maximum">
-                                <number>12</number>
-                            </property>
-                            <property name="value">
-                                <number>10</number>
-                            </property>
-                            <property name="singleStep">
-                                <number>1</number>
-                            </property>
-                            <property name="pageStep">
-                                <number>1</number>
-                            </property>
-                        </widget>
-                    </item>
-
-                    <item row="2" column="0">
-                        <widget class="QLabel" name="labelBackStroke">
-                            <property name="text">
-                                <string>Back stroke:</string>
-                            </property>
-                            <property name="buddy">
-                                <cstring>backStrokeSlider</cstring>
-                            </property>
-                        </widget>
-                    </item>
-                    <item row="2" column="1">
-                        <widget class="QSlider" name="backStrokeSlider">
-                            <property name="minimumSize">
-                                <size>
-                                    <width>60</width>
-                                    <height>0</height>
-                                </size>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="orientation">
-                                <enum>Qt::Horizontal</enum>
-                            </property>
-                            <property name="minimum">
-                                <number>0</number>
-                            </property>
-                            <property name="maximum">
-                                <number>12</number>
-                            </property>
-                            <property name="value">
-                                <number>7</number>
-                            </property>
-                            <property name="singleStep">
-                                <number>1</number>
-                            </property>
-                            <property name="pageStep">
-                                <number>1</number>
-                            </property>
-                        </widget>
-                    </item>
-
-                    <item row="3" column="0">
-                        <widget class="QLabel" name="labelFaceAge">
-                            <property name="text">
-                                <string>Face length:</string>
-                            </property>
-                            <property name="buddy">
-                                <cstring>faceAgeSlider</cstring>
-                            </property>
-                        </widget>
-                    </item>
-                    <item row="3" column="1">
-                        <widget class="QSlider" name="faceAgeSlider">
-                            <property name="minimumSize">
-                                <size>
-                                    <width>60</width>
-                                    <height>0</height>
-                                </size>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="orientation">
-                                <enum>Qt::Horizontal</enum>
-                            </property>
-                            <property name="minimum">
-                                <number>0</number>
-                            </property>
-                            <property name="maximum">
-                                <number>100</number>
-                            </property>
-                            <property name="value">
-                                <number>75</number>
-                            </property>
-                            <property name="singleStep">
-                                <number>1</number>
-                            </property>
-                            <property name="pageStep">
-                                <number>5</number>
-                            </property>
-                            <property name="toolTip">
-                                <string>Child at 0, adult at 100. Only the added face guides change.</string>
-                            </property>
-                        </widget>
-                    </item>
-
-                    <item row="4" column="0">
-                        <widget class="QLabel" name="labelChinWidth">
-                            <property name="text">
-                                <string>Face width:</string>
-                            </property>
-                            <property name="buddy">
-                                <cstring>chinWidthSlider</cstring>
-                            </property>
-                        </widget>
-                    </item>
-                    <item row="4" column="1">
-                        <widget class="QSlider" name="chinWidthSlider">
-                            <property name="minimumSize">
-                                <size>
-                                    <width>60</width>
-                                    <height>0</height>
-                                </size>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="orientation">
-                                <enum>Qt::Horizontal</enum>
-                            </property>
-                            <property name="minimum">
-                                <number>0</number>
-                            </property>
-                            <property name="maximum">
-                                <number>150</number>
-                            </property>
-                            <property name="value">
-                                <number>100</number>
-                            </property>
-                            <property name="singleStep">
-                                <number>1</number>
-                            </property>
-                            <property name="pageStep">
-                                <number>5</number>
-                            </property>
-                            <property name="toolTip">
-                                <string>Narrow at 50, original width at 100, wider at 150.</string>
-                            </property>
-                        </widget>
-                    </item>
-
-
-                    <item row="5" column="0">
-                        <widget class="QLabel" name="labelStrokeColor">
-                            <property name="text">
-                                <string>Stroke color:</string>
-                            </property>
-                        </widget>
-                    </item>
-                    <item row="5" column="1">
-                        <layout class="QHBoxLayout" name="strokeColorLayout">
-                            <property name="spacing">
-                                <number>4</number>
-                            </property>
-                            <item>
-                                <widget class="QFrame" name="strokeColorSwatch">
-                                    <property name="minimumSize">
-                                        <size>
-                                            <width>24</width>
-                                            <height>16</height>
-                                        </size>
-                                    </property>
-                                    <property name="styleSheet">
-                                        <string notr="true">background-color: #6A54E7; border: 1px solid #666;</string>
-                                    </property>
-                                    <property name="frameShape">
-                                        <enum>QFrame::Panel</enum>
-                                    </property>
-                                    <property name="frameShadow">
-                                        <enum>QFrame::Sunken</enum>
-                                    </property>
-                                </widget>
-                            </item>
-                            <item>
-                                <widget class="QPushButton" name="strokeColorButton">
-                                    <property name="text">
-                                        <string>Choose…</string>
-                                    </property>
-                                </widget>
-                            </item>
-                            <item>
-                                <spacer name="strokeColorStretch">
-                                    <property name="orientation">
-                                        <enum>Qt::Horizontal</enum>
-                                    </property>
-                                    <property name="sizeType">
-                                        <enum>QSizePolicy::Expanding</enum>
-                                    </property>
-                                </spacer>
-                            </item>
-                        </layout>
-                    </item>
-                </layout>
+                    <layout class="QGridLayout" name="shapeLayout">
+                        <property name="horizontalSpacing">
+                            <number>8</number>
+                        </property>
+                        <property name="verticalSpacing">
+                            <number>4</number>
+                        </property>
+                        <item row="0" column="0">
+                            <widget class="QLabel" name="labelSideCut">
+                                <property name="text">
+                                    <string>Side cut:</string>
+                                </property>
+                                <property name="buddy">
+                                    <cstring>sideCutSlider</cstring>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="0" column="1">
+                            <widget class="QSlider" name="sideCutSlider">
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>60</width>
+                                        <height>0</height>
+                                    </size>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                                        <horstretch>1</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="minimum">
+                                    <number>5</number>
+                                </property>
+                                <property name="maximum">
+                                    <number>100</number>
+                                </property>
+                                <property name="value">
+                                    <number>66</number>
+                                </property>
+                                <property name="singleStep">
+                                    <number>1</number>
+                                </property>
+                                <property name="pageStep">
+                                    <number>5</number>
+                                </property>
+                                <property name="toolTip">
+                                    <string>Distance of the side-cut planes from center (5–100). At 100 the cut is off.</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="0" column="2">
+                            <widget class="QLabel" name="sideCutValue">
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>28</width>
+                                        <height>0</height>
+                                    </size>
+                                </property>
+                                <property name="text">
+                                    <string>66</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="0" colspan="2">
+                            <widget class="QCheckBox" name="showFace">
+                                <property name="text">
+                                    <string>Face guides</string>
+                                </property>
+                                <property name="checked">
+                                    <bool>true</bool>
+                                </property>
+                                <property name="toolTip">
+                                    <string>Jaw, chin and cheek guides. Applies to Face length and Face width.</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="2" column="0">
+                            <widget class="QLabel" name="labelFaceAge">
+                                <property name="text">
+                                    <string>Face length:</string>
+                                </property>
+                                <property name="buddy">
+                                    <cstring>faceAgeSlider</cstring>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="2" column="1">
+                            <widget class="QSlider" name="faceAgeSlider">
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>60</width>
+                                        <height>0</height>
+                                    </size>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                                        <horstretch>1</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="minimum">
+                                    <number>0</number>
+                                </property>
+                                <property name="maximum">
+                                    <number>100</number>
+                                </property>
+                                <property name="value">
+                                    <number>75</number>
+                                </property>
+                                <property name="singleStep">
+                                    <number>1</number>
+                                </property>
+                                <property name="pageStep">
+                                    <number>5</number>
+                                </property>
+                                <property name="toolTip">
+                                    <string>Child at 0, adult at 100. Only the added face guides change.</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="2" column="2">
+                            <widget class="QLabel" name="faceAgeValue">
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>28</width>
+                                        <height>0</height>
+                                    </size>
+                                </property>
+                                <property name="text">
+                                    <string>75</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="3" column="0">
+                            <widget class="QLabel" name="labelChinWidth">
+                                <property name="text">
+                                    <string>Face width:</string>
+                                </property>
+                                <property name="buddy">
+                                    <cstring>chinWidthSlider</cstring>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="3" column="1">
+                            <widget class="QSlider" name="chinWidthSlider">
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>60</width>
+                                        <height>0</height>
+                                    </size>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                                        <horstretch>1</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="minimum">
+                                    <number>0</number>
+                                </property>
+                                <property name="maximum">
+                                    <number>150</number>
+                                </property>
+                                <property name="value">
+                                    <number>100</number>
+                                </property>
+                                <property name="singleStep">
+                                    <number>1</number>
+                                </property>
+                                <property name="pageStep">
+                                    <number>5</number>
+                                </property>
+                                <property name="toolTip">
+                                    <string>Narrow at 50, original width at 100, wider at 150.</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="3" column="2">
+                            <widget class="QLabel" name="chinWidthValue">
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>28</width>
+                                        <height>0</height>
+                                    </size>
+                                </property>
+                                <property name="text">
+                                    <string>100</string>
+                                </property>
+                            </widget>
+                        </item>
+                    </layout>
+                </widget>
             </item>
 
             <item>
@@ -535,28 +472,19 @@
                         </sizepolicy>
                     </property>
                     <layout class="QGridLayout" name="guidesLayout">
-                        <property name="leftMargin">
-                            <number>6</number>
-                        </property>
-                        <property name="topMargin">
-                            <number>4</number>
-                        </property>
-                        <property name="rightMargin">
-                            <number>6</number>
-                        </property>
-                        <property name="bottomMargin">
-                            <number>4</number>
-                        </property>
                         <property name="horizontalSpacing">
-                            <number>4</number>
+                            <number>8</number>
                         </property>
                         <property name="verticalSpacing">
-                            <number>2</number>
+                            <number>4</number>
                         </property>
                         <item row="0" column="0">
-                            <widget class="QCheckBox" name="showFace">
+                            <widget class="QCheckBox" name="showArrow">
                                 <property name="text">
-                                    <string>Show Face</string>
+                                    <string>Arrow</string>
+                                </property>
+                                <property name="toolTip">
+                                    <string>Arrow pointing in the face direction.</string>
                                 </property>
                                 <property name="checked">
                                     <bool>true</bool>
@@ -564,9 +492,12 @@
                             </widget>
                         </item>
                         <item row="0" column="1">
-                            <widget class="QCheckBox" name="showArrow">
+                            <widget class="QCheckBox" name="showSilhouette">
                                 <property name="text">
-                                    <string>Show Arrow</string>
+                                    <string>Silhouette</string>
+                                </property>
+                                <property name="toolTip">
+                                    <string>Outline of the head sphere as seen from the camera.</string>
                                 </property>
                                 <property name="checked">
                                     <bool>true</bool>
@@ -574,9 +505,12 @@
                             </widget>
                         </item>
                         <item row="1" column="0">
-                            <widget class="QCheckBox" name="showSilhouette">
+                            <widget class="QCheckBox" name="showSideRims">
                                 <property name="text">
-                                    <string>Silhouette</string>
+                                    <string>Side rims</string>
+                                </property>
+                                <property name="toolTip">
+                                    <string>Circles on the side-cut planes.</string>
                                 </property>
                                 <property name="checked">
                                     <bool>true</bool>
@@ -584,24 +518,206 @@
                             </widget>
                         </item>
                         <item row="1" column="1">
-                            <widget class="QCheckBox" name="showSideRims">
+                            <widget class="QCheckBox" name="showSideCross">
                                 <property name="text">
-                                    <string>Side Rims</string>
+                                    <string>Side cross</string>
+                                </property>
+                                <property name="toolTip">
+                                    <string>Cross lines on the side-cut planes.</string>
                                 </property>
                                 <property name="checked">
                                     <bool>true</bool>
                                 </property>
                             </widget>
                         </item>
-                        <item row="2" column="0">
-                            <widget class="QCheckBox" name="showSideCross">
+                    </layout>
+                </widget>
+            </item>
+
+            <item>
+                <widget class="QGroupBox" name="groupStyle">
+                    <property name="title">
+                        <string>Style</string>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <layout class="QGridLayout" name="styleLayout">
+                        <property name="horizontalSpacing">
+                            <number>8</number>
+                        </property>
+                        <property name="verticalSpacing">
+                            <number>4</number>
+                        </property>
+                        <item row="0" column="0">
+                            <widget class="QLabel" name="labelFrontStroke">
                                 <property name="text">
-                                    <string>Side Cross</string>
+                                    <string>Front stroke:</string>
                                 </property>
-                                <property name="checked">
-                                    <bool>true</bool>
+                                <property name="buddy">
+                                    <cstring>frontStrokeSlider</cstring>
                                 </property>
                             </widget>
+                        </item>
+                        <item row="0" column="1">
+                            <widget class="QSlider" name="frontStrokeSlider">
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>60</width>
+                                        <height>0</height>
+                                    </size>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                                        <horstretch>1</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="minimum">
+                                    <number>1</number>
+                                </property>
+                                <property name="maximum">
+                                    <number>12</number>
+                                </property>
+                                <property name="value">
+                                    <number>10</number>
+                                </property>
+                                <property name="singleStep">
+                                    <number>1</number>
+                                </property>
+                                <property name="pageStep">
+                                    <number>1</number>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="0" column="2">
+                            <widget class="QLabel" name="frontStrokeValue">
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>28</width>
+                                        <height>0</height>
+                                    </size>
+                                </property>
+                                <property name="text">
+                                    <string>10</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="0">
+                            <widget class="QLabel" name="labelBackStroke">
+                                <property name="text">
+                                    <string>Back stroke:</string>
+                                </property>
+                                <property name="buddy">
+                                    <cstring>backStrokeSlider</cstring>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="1">
+                            <widget class="QSlider" name="backStrokeSlider">
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>60</width>
+                                        <height>0</height>
+                                    </size>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                                        <horstretch>1</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="minimum">
+                                    <number>0</number>
+                                </property>
+                                <property name="maximum">
+                                    <number>12</number>
+                                </property>
+                                <property name="value">
+                                    <number>7</number>
+                                </property>
+                                <property name="singleStep">
+                                    <number>1</number>
+                                </property>
+                                <property name="pageStep">
+                                    <number>1</number>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="2">
+                            <widget class="QLabel" name="backStrokeValue">
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>28</width>
+                                        <height>0</height>
+                                    </size>
+                                </property>
+                                <property name="text">
+                                    <string>7</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="2" column="0">
+                            <widget class="QLabel" name="labelStrokeColor">
+                                <property name="text">
+                                    <string>Stroke color:</string>
+                                </property>
+                                <property name="buddy">
+                                    <cstring>strokeColorButton</cstring>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="2" column="1">
+                            <layout class="QHBoxLayout" name="strokeColorLayout">
+                                <property name="spacing">
+                                    <number>4</number>
+                                </property>
+                                <item>
+                                    <widget class="QFrame" name="strokeColorSwatch">
+                                        <property name="minimumSize">
+                                            <size>
+                                                <width>24</width>
+                                                <height>16</height>
+                                            </size>
+                                        </property>
+                                        <property name="styleSheet">
+                                            <string notr="true">background-color: #6A54E7; border: 1px solid #666;</string>
+                                        </property>
+                                        <property name="frameShape">
+                                            <enum>QFrame::Panel</enum>
+                                        </property>
+                                        <property name="frameShadow">
+                                            <enum>QFrame::Sunken</enum>
+                                        </property>
+                                    </widget>
+                                </item>
+                                <item>
+                                    <widget class="QPushButton" name="strokeColorButton">
+                                        <property name="text">
+                                            <string>Choose…</string>
+                                        </property>
+                                    </widget>
+                                </item>
+                                <item>
+                                    <spacer name="strokeColorStretch">
+                                        <property name="orientation">
+                                            <enum>Qt::Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>QSizePolicy::Expanding</enum>
+                                        </property>
+                                    </spacer>
+                                </item>
+                            </layout>
                         </item>
                     </layout>
                 </widget>
@@ -616,16 +732,9 @@
                         <number>4</number>
                     </property>
                     <item row="0" column="0" colspan="2">
-                        <widget class="QPushButton" name="resetButton">
-                            <property name="text">
-                                <string>Reset Rotation</string>
-                            </property>
-                        </widget>
-                    </item>
-                    <item row="1" column="0" colspan="2">
                         <widget class="QPushButton" name="resetSettingsButton">
                             <property name="text">
-                                <string>Reset Defaults</string>
+                                <string>Reset to defaults</string>
                             </property>
                         </widget>
                     </item>
@@ -634,6 +743,11 @@
 
             <item>
                 <widget class="QLabel" name="creditLabel">
+                    <property name="font">
+                        <font>
+                            <pointSize>7</pointSize>
+                        </font>
+                    </property>
                     <property name="text">
                         <string>Based on the original Loomis Head Generator by lm0ss. Forked by Nedeljko Umjetnik, then forked by pinw.</string>
                     </property>

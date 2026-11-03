@@ -21,7 +21,7 @@ Based on the original [Loomis Head Generator by lm0ss](https://github.com/lm0ss/
 - Selecting a head layer in Krita activates that head in the docker.
 - Save and load visual presets outside the `.kra` file. Only the **Front** built-in preset is included.
 - Each head's position, direction, and size are saved inside the document and restored when the document is reopened.
-- **Reset Defaults** restores the head's assigned preset (or the global defaults when it has none) without changing position, rotation, or size.
+- **Reset to defaults** restores the head's assigned preset (or the global defaults when it has none) without changing position, rotation, or size.
 
 ## Requirements
 
@@ -41,7 +41,7 @@ Krita 6 / PyQt6 is not supported.
 
 Enable **Settings -> Dockers -> Loomis Method Head Guide**.
 
-1. Use the **Heads** row to pick the active head. **New** adds a head, **Copy** duplicates it with an offset, and **Delete** removes it.
+1. Select a head layer in Krita's Layers docker to make it active. The docker labels the active head; **New** adds a head, **Copy** duplicates it with an offset, and **Delete** removes it.
 2. Adjust the active head with the trackball and sliders. The document updates live.
 3. Move or scale the layer with Krita's Move or Transform tools. The docker mirrors the placement, then normalizes the guide after the gesture settles.
 
@@ -59,7 +59,7 @@ User presets store visual settings only. They do not store position, direction, 
 
 Each head remembers the preset assigned to it, whether it has unsaved edits, and its full visual configuration inside the document. The current position, direction, and size are saved per layer as well, so reopening the `.kra` restores the head exactly. An edited preset is marked with ` *` in the preset list until it is saved or reloaded.
 
-**Reset Defaults** restores the assigned preset and clears the dirty marker. If the head has no preset, or its preset no longer exists, it falls back to the global defaults and clears the stale assignment. Position, rotation, and size are never reset.
+**Reset to defaults** restores the assigned preset and clears the dirty marker. If the head has no preset, or its preset no longer exists, it falls back to the global defaults and clears the stale assignment. Position, rotation, and size are never reset.
 
 - Select a preset and click **Load**.
 - Click **Save** to store the current settings under a new name.
@@ -79,6 +79,7 @@ On Linux the preset file is usually
 `~/.local/share/krita/loomis_method_head_guide/presets.json`.
 
 The plugin uses the library name `loomis_head`, so it cannot be installed alongside another plugin that uses the same library name.
+
 
 ### Performance logging
 

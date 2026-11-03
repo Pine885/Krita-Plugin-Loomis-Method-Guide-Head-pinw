@@ -25,7 +25,6 @@ from .config import (
 from .head_instance import (
     NORMALIZE_SETTLE_POLLS,
     HeadInstance,
-    _name_index,
     is_head_name,
     iter_vector_layers,
 )
@@ -174,7 +173,7 @@ class LoomisProportionsDocker(DockWidget):
                 self._flush_local_state()
             self.doc = None
             self.state = None
-            self.refresh_instance_combo()
+            self.refresh_instance_header()
             self.sync_ui_from_model()
             return
 
@@ -202,7 +201,7 @@ class LoomisProportionsDocker(DockWidget):
         self._last_sync = 0.0
 
         self._reconcile_instances()
-        self.refresh_instance_combo()
+        self.refresh_instance_header()
         self.sync_ui_from_model()
 
     def _read_local_state(self, doc):
@@ -357,7 +356,7 @@ class LoomisProportionsDocker(DockWidget):
             changed = True
 
         if changed:
-            self.refresh_instance_combo()
+            self.refresh_instance_header()
             self.sync_ui_from_model()
 
     def _sync_active_reference(self):
@@ -397,7 +396,7 @@ class LoomisProportionsDocker(DockWidget):
         instance = HeadInstance.create(state.doc, model)
         state.instances[_node_key(instance.layer)] = instance
         state.active_id = _node_key(instance.layer)
-        self.refresh_instance_combo()
+        self.refresh_instance_header()
         self.sync_ui_from_model()
         instance.reveal(state.doc)
         self._remember_instance(instance)
@@ -450,22 +449,8 @@ class LoomisProportionsDocker(DockWidget):
                     state.active_id = None
                 break
         self._flush_local_state()
-        self.refresh_instance_combo()
+        self.refresh_instance_header()
         self.sync_ui_from_model()
-
-    def select_instance(self, index):
-        state = self.active_state()
-        if state is None or index < 0:
-            return
-        key = self.ui.headCombo.itemData(index)
-        if key not in state.instances or key == state.active_id:
-            return
-        self.flush_pending_draw()
-        try:
-            self.doc.setActiveNode(state.instances[key].layer)
-        except Exception:
-            pass
-        self._activate_instance(key)
 
     def _adopt_instance_placement(self, instance):
         """Absorb moves and scales made while this head was not active."""
@@ -490,29 +475,31 @@ class LoomisProportionsDocker(DockWidget):
             self._adopt_instance_placement(previous)
         self._adopt_instance_placement(state.instances[key])
         state.active_id = key
-        self.refresh_instance_combo()
+        self.refresh_instance_header()
         self.sync_ui_from_model()
 
-    def refresh_instance_combo(self):
-        combo = self.ui.headCombo
+    def refresh_instance_header(self):
+        label = self.ui.headLabel
         state = self.active_state()
-        combo.blockSignals(True)
-        combo.clear()
-        if state is not None:
-            for key, instance in sorted(
-                state.instances.items(),
-                key=lambda item: (_name_index(item[1].name), item[1].name),
-            ):
-                combo.addItem(instance.name, key)
-            if state.active_id is not None:
-                index = combo.findData(state.active_id)
-                combo.setCurrentIndex(index)
-            else:
-                combo.setCurrentIndex(-1)
-        combo.blockSignals(False)
+        instance = state.active() if state is not None else None
+        if instance is not None:
+            label.setText(instance.name)
+            label.setToolTip(instance.name)
+        else:
+            label.setText("No head")
+            label.setToolTip("")
 
-        has_instance = state is not None and state.active() is not None
-        self.ui.headCombo.setEnabled(bool(state and state.instances))
+        hint = self.ui.emptyHintLabel
+        if state is None:
+            hint.setText("Open or create a document.")
+            hint.setVisible(True)
+        elif instance is None:
+            hint.setText("Select a _HeadGuide layer in Layers, or click New.")
+            hint.setVisible(True)
+        else:
+            hint.setVisible(False)
+
+        has_instance = instance is not None
         self.ui.addHeadButton.setEnabled(state is not None)
         self.ui.duplicateHeadButton.setEnabled(has_instance)
         self.ui.deleteHeadButton.setEnabled(has_instance)
@@ -552,7 +539,6 @@ class LoomisProportionsDocker(DockWidget):
             self.ui.showSideCross,
             self.ui.strokeColorButton,
             self.ui.trackballHost,
-            self.ui.resetButton,
             self.ui.resetSettingsButton,
         ]
         for widget in widgets:
@@ -593,8 +579,10 @@ class LoomisProportionsDocker(DockWidget):
         combo.blockSignals(False)
         reset_button = self.ui.resetSettingsButton
         if index >= 0 and name:
+            reset_button.setText("Reset to preset")
             reset_button.setToolTip("Reset to preset “%s”." % name)
         else:
+            reset_button.setText("Reset to defaults")
             reset_button.setToolTip("Reset to global defaults.")
         self._update_preset_buttons()
 
@@ -694,6 +682,12 @@ class LoomisProportionsDocker(DockWidget):
             lambda v: self.with_schedule_update(lambda: self.loomis_head.set_back_line_stroke(v))
         )
 
+        self.ui.sideCutSlider.valueChanged.connect(self._update_value_labels)
+        self.ui.faceAgeSlider.valueChanged.connect(self._update_value_labels)
+        self.ui.chinWidthSlider.valueChanged.connect(self._update_value_labels)
+        self.ui.frontStrokeSlider.valueChanged.connect(self._update_value_labels)
+        self.ui.backStrokeSlider.valueChanged.connect(self._update_value_labels)
+
         self.ui.showArrow.toggled.connect(
             lambda v: self.with_schedule_update(lambda: self.loomis_head.set_arrow(v))
         )
@@ -707,10 +701,9 @@ class LoomisProportionsDocker(DockWidget):
             lambda v: self.with_schedule_update(lambda: self.loomis_head.set_side_cross(v))
         )
         self.ui.strokeColorButton.clicked.connect(self.pick_stroke_color)
-        self.ui.resetButton.clicked.connect(self.reset_view)
+        self.trackball.reset_button.clicked.connect(self.reset_view)
         self.ui.resetSettingsButton.clicked.connect(self.reset_settings)
 
-        self.ui.headCombo.currentIndexChanged.connect(self.select_instance)
         self.ui.addHeadButton.clicked.connect(self.add_head_clicked)
         self.ui.duplicateHeadButton.clicked.connect(self.duplicate_head_clicked)
         self.ui.deleteHeadButton.clicked.connect(self.delete_head_clicked)
@@ -721,6 +714,14 @@ class LoomisProportionsDocker(DockWidget):
         self.ui.presetCombo.currentIndexChanged.connect(self._update_preset_buttons)
 
         self._sync_color_swatch()
+        self._update_value_labels()
+
+    def _update_value_labels(self, *_):
+        self.ui.sideCutValue.setText(str(self.ui.sideCutSlider.value()))
+        self.ui.faceAgeValue.setText(str(self.ui.faceAgeSlider.value()))
+        self.ui.chinWidthValue.setText(str(self.ui.chinWidthSlider.value()))
+        self.ui.frontStrokeValue.setText(str(self.ui.frontStrokeSlider.value()))
+        self.ui.backStrokeValue.setText(str(self.ui.backStrokeSlider.value()))
 
     # --- presets --------------------------------------------------------
 
@@ -872,6 +873,7 @@ class LoomisProportionsDocker(DockWidget):
         for widget in widgets:
             widget.blockSignals(False)
 
+        self._update_value_labels()
         self._sync_color_swatch()
         self.trackball.blockSignals(True)
         self.trackball.set_quaternion(model.q)

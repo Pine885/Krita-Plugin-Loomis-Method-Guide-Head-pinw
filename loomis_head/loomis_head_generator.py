@@ -366,10 +366,41 @@ class LoomisHead3D:
             for s in fsegs:
                 front_paths.append(path_str(self._to_screen(s, width, height)))
 
+    def _jaw_points(
+        self, side: float, d_geom: float, rim_r: float
+    ) -> tuple[Vector3, Vector3, Vector3]:
+        r = self.radius
+        # Child/adult slider shortens the added lower face toward the child end.
+        # At 100 (adult), the original v0.2.4 proportions are unchanged.
+        age = self.face_age
+        jaw_length = 0.8 * (1.22 * r - rim_r) * (0.65 + 0.35 * age)
+        jaw_angle = math.radians(10.0)
+        front_extension_length = r  # keep the front reach tied to the original sphere
+        front_down_angle = math.radians(12.0 + 8.0 * age)
+        front_inward_angle = math.radians(15.0)
+
+        p0 = Vector3(side * d_geom, -rim_r, 0.0)
+        p1 = Vector3(
+            side * d_geom - side * jaw_length * math.tan(jaw_angle),
+            -rim_r - jaw_length,
+            0.0,
+        )
+        raw_x = p1.x - side * front_extension_length * math.tan(front_inward_angle)
+        if raw_x * side < 0.0:
+            raw_x = 0.0
+        p2 = Vector3(
+            raw_x * self.chin_width,
+            p1.y - front_extension_length * math.tan(front_down_angle),
+            p1.z + front_extension_length,
+        )
+        return p0, p1, p2
+
     def build_svg(self, width: float, height: float, dash_back: str | None = "5,6", samples: int = 256) -> str:
         r = self.radius
+        cut_off = self.side_cut >= limits.SIDE_CUT.maximum - 1e-9
         d = limits.SIDE_CUT.clamp(float(self.side_cut)) * r
-        rim_r = math.sqrt(max(r * r - d * d, EPS))
+        d_geom = min(limits.SIDE_CUT.clamp(float(self.side_cut)), limits.SIDE_CUT_GEOMETRY_MAX) * r
+        rim_r = math.sqrt(max(r * r - d_geom * d_geom, EPS))
 
         nx = Vector3(1.0, 0.0, 0.0)
         ny = Vector3(0.0, 1.0, 0.0)
@@ -391,14 +422,14 @@ class LoomisHead3D:
         rims_plus: list[Poly3] = []
         rims_minus: list[Poly3] = []
 
-        if self.show_side_rims:
+        if self.show_side_rims and not cut_off:
             rims_plus.append(self._circle_on_plane(nx, [d, 0.0, 0.0], rim_r, samples))
             rims_minus.append(self._circle_on_plane(nx, [-d, 0.0, 0.0], rim_r, samples))
 
         crosses_plus: list[Poly3] = []
         crosses_minus: list[Poly3] = []
 
-        if self.show_side_cross:
+        if self.show_side_cross and not cut_off:
             crosses_plus.extend(
                 [
                     [Vector3(d, -rim_r, 0.0), Vector3(d, rim_r, 0.0)],
@@ -419,26 +450,8 @@ class LoomisHead3D:
         # downward slope and 15-degree inward direction. Keep the two sides separate.
         jaw_curves: list[Poly3] = []
         jaw_front_endpoints: dict[float, Vector3] = {}
-        # Child/adult slider shortens the added lower face toward the child end.
-        # At 100 (adult), the original v0.2.4 proportions are unchanged.
-        age = self.face_age
-        jaw_length = 0.8 * (1.22 * r - rim_r) * (0.65 + 0.35 * age)
-        jaw_angle = math.radians(10.0)
-        front_extension_length = r  # keep the front reach tied to the original sphere
-        front_down_angle = math.radians(12.0 + 8.0 * age)
-        front_inward_angle = math.radians(15.0)
         for side in (-1.0, 1.0):
-            p0 = Vector3(side * d, -rim_r, 0.0)
-            p1 = Vector3(
-                side * d - side * jaw_length * math.tan(jaw_angle),
-                -rim_r - jaw_length,
-                0.0,
-            )
-            p2 = Vector3(
-                (p1.x - side * front_extension_length * math.tan(front_inward_angle)) * self.chin_width,
-                p1.y - front_extension_length * math.tan(front_down_angle),
-                p1.z + front_extension_length,
-            )
+            p0, p1, p2 = self._jaw_points(side, d_geom, rim_r)
 
             # Cubic Bezier control points keep the curve tangent to the original
             # first and second segment directions, removing the sharp corner at p1.
@@ -483,7 +496,7 @@ class LoomisHead3D:
         for side in (-1.0, 1.0):
             # Start exactly where the forward end of the depth-wise side-cross
             # guide meets the side-rim circle.
-            cheek_rim_touch = Vector3(side * d, 0.0, rim_r)
+            cheek_rim_touch = Vector3(side * d_geom, 0.0, rim_r)
             cheek_end = jaw_front_endpoints[side]
 
             # One continuous arc from the rim directly to the chin junction.
@@ -515,7 +528,8 @@ class LoomisHead3D:
         back_paths: list[str] = []
 
         for c in curves:
-            self._emit_segments(clip_to_side_band(c, d), width, height, front_paths, back_paths)
+            segments = [c] if cut_off else clip_to_side_band(c, d)
+            self._emit_segments(segments, width, height, front_paths, back_paths)
         if self.show_face:
             for jaw_curve in jaw_curves:
                 self._emit_segments([jaw_curve], width, height, front_paths, back_paths)
